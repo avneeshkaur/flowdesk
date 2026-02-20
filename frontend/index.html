@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FlowDesk — Enterprise Workflow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #05080f;
+      --glass: rgba(255,255,255,0.04);
+      --glass2: rgba(255,255,255,0.07);
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.13);
+      --accent: #6ea8fe;
+      --accent2: #a78bfa;
+      --green: #34d399;
+      --amber: #fbbf24;
+      --red: #f87171;
+      --text: #e8ecf4;
+      --text2: #94a3b8;
+      --text3: #374151;
+    }
+    html,body{height:100%;}
+    body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+    /* BG */
+    .bg-scene{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+    .bg-scene::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 90% 70% at 15% -5%,rgba(110,168,254,.12) 0%,transparent 55%),radial-gradient(ellipse 60% 55% at 85% 105%,rgba(167,139,250,.09) 0%,transparent 55%);}
+    .bg-scene::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:56px 56px;}
+    .orb{position:absolute;border-radius:50%;filter:blur(80px);animation:drift 12s ease-in-out infinite alternate;}
+    .orb1{width:380px;height:380px;top:-80px;left:-80px;background:rgba(110,168,254,.12);animation-delay:0s;}
+    .orb2{width:280px;height:280px;bottom:-60px;right:-60px;background:rgba(167,139,250,.10);animation-delay:-5s;}
+    @keyframes drift{from{transform:translate(0,0) scale(1);}to{transform:translate(25px,18px) scale(1.07);}}
+
+    #app{position:relative;z-index:1;min-height:100vh;}
+    .page{display:none;min-height:100vh;}
+    .page.active{display:flex;}
+
+    /* ── LOGIN ── */
+    #login-page{align-items:center;justify-content:center;padding:2rem;}
+    .login-wrap{
+      display:grid;grid-template-columns:1fr 420px;
+      width:100%;max-width:880px;min-height:540px;
+      border-radius:24px;overflow:hidden;
+      border:1px solid var(--border2);
+      box-shadow:0 40px 100px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.04) inset;
+      animation:riseIn .7s cubic-bezier(.16,1,.3,1) both;
+    }
+    @keyframes riseIn{from{opacity:0;transform:translateY(28px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+    .login-left{
+      background:linear-gradient(145deg,rgba(110,168,254,.1),rgba(167,139,250,.06));
+      backdrop-filter:blur(20px);padding:2.8rem;
+      display:flex;flex-direction:column;justify-content:space-between;
+      border-right:1px solid var(--border);position:relative;overflow:hidden;
+    }
+    .ll-brand{display:flex;align-items:center;gap:11px;}
+    .ll-logo{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 8px 24px rgba(110,168,254,.25);}
+    .ll-name{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;}
+    .ll-name span{color:var(--accent);}
+    .ll-tagline{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:600;line-height:1.2;color:var(--text);}
+    .ll-tagline em{color:var(--accent);font-style:normal;}
+    .ll-sub{font-size:.84rem;color:var(--text2);line-height:1.7;margin-top:.7rem;}
+    .ll-feats{display:flex;flex-direction:column;gap:9px;}
+    .ll-feat{display:flex;align-items:center;gap:9px;font-size:.8rem;color:var(--text2);}
+    .ll-dot{width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0;}
+
+    .login-right{background:rgba(5,8,15,.88);backdrop-filter:blur(24px);padding:2.4rem;display:flex;flex-direction:column;justify-content:center;}
+    .lr-title{font-family:'Cormorant Garamond',serif;font-size:1.75rem;font-weight:600;margin-bottom:.25rem;}
+    .lr-sub{font-size:.8rem;color:var(--text2);margin-bottom:1.6rem;}
+
+    .tabs{display:flex;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:1.4rem;}
+    .tab-btn{flex:1;padding:8px;background:transparent;border:none;color:var(--text2);font-family:'Outfit',sans-serif;font-size:.83rem;border-radius:8px;cursor:pointer;transition:all .2s;}
+    .tab-btn.active{background:var(--glass2);color:var(--text);box-shadow:0 2px 10px rgba(0,0,0,.3);}
+    .tab-content{display:none;}
+    .tab-content.active{display:block;}
+
+    .fg{margin-bottom:.9rem;}
+    .fl{display:block;font-size:.7rem;font-weight:500;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px;}
+    .fi,.fsel{width:100%;padding:10px 13px;background:var(--glass);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;transition:all .2s;-webkit-appearance:none;}
+    .fi::placeholder{color:var(--text3);}
+    .fi:focus,.fsel:focus{border-color:rgba(110,168,254,.45);background:rgba(110,168,254,.04);box-shadow:0 0 0 3px rgba(110,168,254,.08);}
+    .fsel option{background:#0d1117;}
+
+    .btn-p{width:100%;padding:12px;background:linear-gradient(135deg,#4f8ef7,#6366f1);border:none;border-radius:10px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;margin-top:.3rem;transition:all .2s;box-shadow:0 4px 18px rgba(79,142,247,.28);}
+    .btn-p:hover{transform:translateY(-1px);box-shadow:0 8px 26px rgba(79,142,247,.38);}
+
+    .err-box{background:rgba(248,113,113,.09);border:1px solid rgba(248,113,113,.18);color:#fca5a5;border-radius:8px;padding:9px 12px;font-size:.8rem;margin-top:.6rem;display:none;}
+
+    .demo-box{margin-top:.9rem;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:11px;}
+    .demo-lbl{font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;font-weight:600;}
+    .demo-btns{display:flex;flex-wrap:wrap;gap:5px;}
+    .db{padding:5px 11px;border-radius:6px;font-size:.72rem;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:500;border:1px solid;transition:opacity .2s;}
+    .db:hover{opacity:.75;}
+    .db-e{background:rgba(52,211,153,.09);color:#6ee7b7;border-color:rgba(52,211,153,.18);}
+    .db-m{background:rgba(110,168,254,.09);color:#93c5fd;border-color:rgba(110,168,254,.18);}
+    .db-h{background:rgba(167,139,250,.09);color:#c4b5fd;border-color:rgba(167,139,250,.18);}
+    .db-a{background:rgba(251,191,36,.09);color:#fde68a;border-color:rgba(251,191,36,.18);}
+
+    @media(max-width:680px){.login-wrap{grid-template-columns:1fr;}.login-left{display:none;}}
+
+    /* ── MAIN APP ── */
+    #main-page{flex-direction:column;}
+
+    .topbar{height:54px;display:flex;align-items:center;padding:0 1.4rem;gap:1rem;background:rgba(5,8,15,.82);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+    .tb-logo{display:flex;align-items:center;gap:9px;margin-right:auto;}
+    .tb-icon{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:13px;}
+    .tb-name{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700;}
+    .tb-name span{color:var(--accent);}
+    .user-chip{display:flex;align-items:center;gap:7px;background:var(--glass);border:1px solid var(--border2);border-radius:50px;padding:3px 11px 3px 3px;}
+    .u-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;}
+    .u-nm{font-size:.78rem;}
+    .u-rl{font-size:.62rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;}
+    .btn-out{background:transparent;border:1px solid var(--border2);color:var(--text2);padding:5px 13px;border-radius:8px;font-size:.78rem;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;}
+    .btn-out:hover{color:var(--red);border-color:rgba(248,113,113,.35);}
+
+    .app-layout{display:flex;flex:1;}
+    .sidebar{width:205px;min-height:calc(100vh - 54px);border-right:1px solid var(--border);padding:1.1rem .65rem;background:rgba(5,8,15,.35);flex-shrink:0;}
+    .nav-sec{margin-bottom:1.4rem;}
+    .nav-lbl{font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px;margin-bottom:4px;font-weight:600;}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;font-size:.82rem;cursor:pointer;color:var(--text2);transition:all .15s;margin-bottom:1px;}
+    .nav-item:hover{color:var(--text);background:var(--glass);}
+    .nav-item.active{color:var(--accent);background:rgba(110,168,254,.07);}
+    .nav-icon{font-size:13px;width:15px;text-align:center;}
+
+    .content{flex:1;padding:1.7rem;overflow-y:auto;}
+    .view{display:none;}
+    .view.active{display:block;}
+
+    .ph{margin-bottom:1.5rem;}
+    .pt{font-family:'Cormorant Garamond',serif;font-size:1.65rem;font-weight:600;margin-bottom:2px;}
+    .ps{color:var(--text2);font-size:.82rem;}
+
+    .welcome{background:linear-gradient(135deg,rgba(110,168,254,.07),rgba(167,139,250,.04));border:1px solid rgba(110,168,254,.13);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:1.4rem;position:relative;overflow:hidden;}
+    .welcome::after{content:'◈';position:absolute;right:1.4rem;top:50%;transform:translateY(-50%);font-size:2.8rem;color:var(--accent);opacity:.07;}
+    .wt{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;margin-bottom:2px;}
+    .ws{font-size:.8rem;color:var(--text2);}
+
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:.9rem;margin-bottom:1.4rem;}
+    .stat{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:1.15rem;position:relative;overflow:hidden;animation:fu .5s ease both;}
+    .stat::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;}
+    .s-b::before{background:linear-gradient(90deg,var(--accent),var(--accent2));}
+    .s-g::before{background:var(--green);}
+    .s-a::before{background:var(--amber);}
+    .s-r::before{background:var(--red);}
+    .sl{font-size:.67rem;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;}
+    .sv{font-family:'Cormorant Garamond',serif;font-size:2.1rem;font-weight:700;line-height:1;}
+    .si{position:absolute;right:.9rem;top:.9rem;font-size:1.2rem;opacity:.1;}
+    @keyframes fu{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+    .d1{animation-delay:.05s}.d2{animation-delay:.1s}.d3{animation-delay:.15s}.d4{animation-delay:.2s}
+
+    .card{background:var(--glass);border:1px solid var(--border);border-radius:15px;padding:1.3rem;margin-bottom:1.1rem;}
+    .ct{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;margin-bottom:1rem;}
+
+    .tw{overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;}
+    th{text-align:left;font-size:.65rem;text-transform:uppercase;letter-spacing:1px;color:var(--text3);padding:7px 11px;border-bottom:1px solid var(--border);font-weight:600;}
+    td{padding:10px 11px;font-size:.83rem;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle;}
+    tr:last-child td{border-bottom:none;}
+    tr:hover td{background:rgba(255,255,255,.014);}
+
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:50px;font-size:.68rem;font-weight:500;letter-spacing:.3px;text-transform:uppercase;border:1px solid;}
+    .b-pend{background:rgba(251,191,36,.09);color:#fcd34d;border-color:rgba(251,191,36,.15);}
+    .b-appr{background:rgba(52,211,153,.09);color:#6ee7b7;border-color:rgba(52,211,153,.15);}
+    .b-reje{background:rgba(248,113,113,.09);color:#fca5a5;border-color:rgba(248,113,113,.15);}
+    .b-esca{background:rgba(248,113,113,.09);color:#fca5a5;border-color:rgba(248,113,113,.15);}
+    .b-l1{background:rgba(110,168,254,.09);color:#93c5fd;border-color:rgba(110,168,254,.15);}
+    .b-l2{background:rgba(167,139,250,.09);color:#c4b5fd;border-color:rgba(167,139,250,.15);}
+    .b-l3{background:rgba(251,191,36,.09);color:#fde68a;border-color:rgba(251,191,36,.15);}
+
+    .bsm{padding:4px 12px;font-size:.76rem;border-radius:7px;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:500;transition:opacity .2s;border:1px solid;}
+    .bv{background:rgba(110,168,254,.09);color:#93c5fd;border-color:rgba(110,168,254,.18);}
+    .bapp{background:rgba(52,211,153,.09);color:#6ee7b7;border-color:rgba(52,211,153,.18);}
+    .brej{background:rgba(248,113,113,.09);color:#fca5a5;border-color:rgba(248,113,113,.18);}
+    .bsm:hover{opacity:.72;}
+
+    .btn-s{padding:8px 16px;background:var(--glass);border:1px solid var(--border2);border-radius:9px;color:var(--text2);font-family:'Outfit',sans-serif;font-size:.83rem;cursor:pointer;transition:all .2s;}
+    .btn-s:hover{color:var(--accent);border-color:rgba(110,168,254,.28);}
+
+    .fg2{margin-bottom:.9rem;}
+    .fr{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+    .fta{width:100%;padding:10px 13px;background:var(--glass);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.86rem;outline:none;resize:vertical;min-height:82px;transition:all .2s;}
+    .fta:focus{border-color:rgba(110,168,254,.4);}
+    .fta::placeholder{color:var(--text3);}
+
+    .lvl-steps{display:flex;margin:1rem 0;}
+    .lvl-step{flex:1;text-align:center;position:relative;}
+    .lvl-step:not(:last-child)::after{content:'';position:absolute;top:14px;left:50%;right:-50%;height:1px;background:var(--border);z-index:0;}
+    .lc{width:29px;height:29px;border-radius:50%;background:var(--glass);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:600;margin:0 auto 4px;position:relative;z-index:1;}
+    .lc.a{background:rgba(110,168,254,.18);border-color:var(--accent);color:var(--accent);}
+    .lc.d{background:rgba(52,211,153,.13);border-color:var(--green);color:var(--green);}
+    .lt{font-size:.66rem;color:var(--text2);}
+
+    .timeline{padding-left:22px;position:relative;}
+    .timeline::before{content:'';position:absolute;left:5px;top:0;bottom:0;width:1px;background:var(--border);}
+    .tl-item{position:relative;margin-bottom:1.1rem;animation:fu .4s ease both;}
+    .tl-dot{position:absolute;left:-18px;top:3px;width:9px;height:9px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);}
+    .tl-dot.done{background:var(--green);}
+    .tl-dot.wait{background:var(--text3);}
+    .tl-dot.rej{background:var(--red);}
+    .tl-t{font-size:.83rem;font-weight:500;margin-bottom:2px;}
+    .tl-m{font-size:.7rem;color:var(--text2);}
+
+    .empty{text-align:center;padding:2.4rem 1rem;color:var(--text3);}
+    .ei{font-size:1.8rem;margin-bottom:.5rem;opacity:.35;}
+    .et{font-size:.82rem;}
+
+    .toast{position:fixed;bottom:1.4rem;right:1.4rem;z-index:999;padding:10px 17px;border-radius:9px;font-size:.82rem;font-weight:500;transform:translateY(55px);opacity:0;transition:all .3s;pointer-events:none;background:var(--green);color:#052e16;}
+    .toast.show{transform:translateY(0);opacity:1;}
+    .toast.err{background:var(--red);color:#fff;}
+
+    .dg{display:grid;grid-template-columns:1fr 290px;gap:1.1rem;align-items:start;}
+    @media(max-width:780px){.dg{grid-template-columns:1fr;}}
+
+    .ri{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.035);}
+    .ri:last-child{border-bottom:none;}
+    .rt{font-size:.83rem;font-weight:500;margin-bottom:2px;}
+    .rm{font-size:.7rem;color:var(--text2);}
+
+    .ab-item{margin-bottom:13px;}
+    .ab-h{display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:4px;}
+    .ab-tr{background:var(--glass2);border-radius:50px;height:5px;overflow:hidden;}
+    .ab-fi{height:100%;border-radius:50px;transition:width .9s ease;}
+
+    .hidden{display:none!important;}
+  </style>
+</head>
+<body>
+<div class="bg-scene"><div class="orb orb1"></div><div class="orb orb2"></div></div>
+<div id="app">
+
+<!-- LOGIN -->
+<div id="login-page" class="page active">
+  <div class="login-wrap">
+    <div class="login-left">
+      <div class="ll-brand">
+        <div class="ll-logo">🔄</div>
+        <div class="ll-name">Flow<span>Desk</span></div>
+      </div>
+      <div>
+        <div class="ll-tagline">Enterprise<br/><em>Workflow</em><br/>Simplified.</div>
+        <div class="ll-sub">3-level approval engine with real-time SLA tracking, audit trails, and role-based access control.</div>
+      </div>
+      <div class="ll-feats">
+        <div class="ll-feat"><div class="ll-dot"></div>Multi-level approval matrix</div>
+        <div class="ll-feat"><div class="ll-dot"></div>48hr SLA with auto-escalation</div>
+        <div class="ll-feat"><div class="ll-dot"></div>Full audit trail + IP logging</div>
+        <div class="ll-feat"><div class="ll-dot"></div>Role-based access control</div>
+      </div>
+    </div>
+    <div class="login-right">
+      <div class="lr-title">Welcome back</div>
+      <div class="lr-sub">Sign in to your workspace</div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+        <button class="tab-btn" onclick="switchTab('register')">Register</button>
+      </div>
+      <div id="tab-login" class="tab-content active">
+        <div class="fg"><label class="fl">Email</label><input id="login-email" type="email" class="fi" placeholder="you@company.com"/></div>
+        <div class="fg"><label class="fl">Password</label><input id="login-password" type="password" class="fi" placeholder="••••••••"/></div>
+        <button class="btn-p" onclick="handleLogin()">Sign In →</button>
+        <div id="login-err" class="err-box"></div>
+        <div class="demo-box">
+          <div class="demo-lbl">Quick Demo Access</div>
+          <div class="demo-btns">
+            <button class="db db-e" onclick="demoLogin('employee@test.com','123456')">👤 Employee</button>
+            <button class="db db-m" onclick="demoLogin('manager@test.com','123456')">👔 Manager</button>
+            <button class="db db-h" onclick="demoLogin('hr@test.com','123456')">🏢 HR</button>
+            <button class="db db-a" onclick="demoLogin('admin@test.com','123456')">⚡ Admin</button>
+          </div>
+        </div>
+      </div>
+      <div id="tab-register" class="tab-content">
+        <div class="fg"><label class="fl">Full Name</label><input id="reg-name" type="text" class="fi" placeholder="Your name"/></div>
+        <div class="fg"><label class="fl">Email</label><input id="reg-email" type="email" class="fi" placeholder="you@company.com"/></div>
+        <div class="fg"><label class="fl">Password</label><input id="reg-password" type="password" class="fi" placeholder="Min 6 characters"/></div>
+        <div class="fg"><label class="fl">Role</label><select id="reg-role" class="fsel"><option value="employee">Employee</option><option value="manager">Manager</option><option value="hr">HR</option><option value="admin">Admin</option></select></div>
+        <button class="btn-p" onclick="handleRegister()">Create Account →</button>
+        <div id="reg-err" class="err-box"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main-page" class="page">
+  <div class="topbar">
+    <div class="tb-logo">
+      <div class="tb-icon">🔄</div>
+      <div class="tb-name">Flow<span>Desk</span></div>
+    </div>
+    <div class="user-chip">
+      <div class="u-av" id="top-av">AK</div>
+      <div><div class="u-nm" id="top-nm">—</div><div class="u-rl" id="top-rl">—</div></div>
+    </div>
+    <button class="btn-out" onclick="logout()">Sign out</button>
+  </div>
+  <div class="app-layout">
+    <div class="sidebar">
+      <div class="nav-sec">
+        <div class="nav-lbl">Overview</div>
+        <div class="nav-item active" id="nav-dashboard" onclick="showView('dashboard')"><span class="nav-icon">📊</span>Dashboard</div>
+      </div>
+      <div class="nav-sec">
+        <div class="nav-lbl">Requests</div>
+        <div class="nav-item" id="nav-my-requests" onclick="showView('my-requests')"><span class="nav-icon">📋</span>My Requests</div>
+        <div class="nav-item hidden" id="nav-all-requests" onclick="showView('all-requests')"><span class="nav-icon">📂</span>All Requests</div>
+        <div class="nav-item" id="nav-submit" onclick="showView('submit')"><span class="nav-icon">✦</span>New Request</div>
+      </div>
+      <div class="nav-sec hidden" id="nav-analytics-sec">
+        <div class="nav-lbl">Analytics</div>
+        <div class="nav-item" id="nav-analytics" onclick="showView('analytics')"><span class="nav-icon">📈</span>Analytics</div>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div id="view-dashboard" class="view active">
+        <div class="ph"><div class="pt">Dashboard</div><div class="ps">Real-time workflow overview</div></div>
+        <div class="welcome"><div class="wt" id="welcome-txt">Good day! 👋</div><div class="ws">Here's what's happening across your organization today.</div></div>
+        <div class="stats-grid">
+          <div class="stat s-b d1"><div class="si">📋</div><div class="sl">Total</div><div class="sv" id="st-total">—</div></div>
+          <div class="stat s-a d2"><div class="si">⏳</div><div class="sl">Pending</div><div class="sv" id="st-pending">—</div></div>
+          <div class="stat s-g d3"><div class="si">✅</div><div class="sl">Approved</div><div class="sv" id="st-approved">—</div></div>
+          <div class="stat s-r d4"><div class="si">🚨</div><div class="sl">Escalated</div><div class="sv" id="st-escalated">—</div></div>
+        </div>
+        <div class="card"><div class="ct">Recent Activity</div><div id="recent-list"><div class="empty"><div class="ei">📭</div><div class="et">Loading...</div></div></div></div>
+      </div>
+
+      <!-- MY REQUESTS -->
+      <div id="view-my-requests" class="view">
+        <div class="ph"><div class="pt">My Requests</div><div class="ps">Track all your submitted requests</div></div>
+        <div class="card"><div class="tw"><table><thead><tr><th>Title</th><th>Type</th><th>Status</th><th>Level</th><th>Date</th><th>Action</th></tr></thead><tbody id="my-req-body"><tr><td colspan="6"><div class="empty"><div class="ei">📭</div><div class="et">No requests</div></div></td></tr></tbody></table></div></div>
+      </div>
+
+      <!-- ALL REQUESTS -->
+      <div id="view-all-requests" class="view">
+        <div class="ph"><div class="pt">All Requests</div><div class="ps">Review and action pending approvals</div></div>
+        <div class="card"><div class="tw"><table><thead><tr><th>Title</th><th>Employee</th><th>Type</th><th>Status</th><th>SLA</th><th>Action</th></tr></thead><tbody id="all-req-body"><tr><td colspan="6"><div class="empty"><div class="ei">📭</div><div class="et">Loading...</div></div></td></tr></tbody></table></div></div>
+      </div>
+
+      <!-- SUBMIT -->
+      <div id="view-submit" class="view">
+        <div class="ph"><div class="pt">New Request</div><div class="ps">Submit for multi-level approval</div></div>
+        <div class="card">
+          <div class="ct">Request Details</div>
+          <div class="fg2"><label class="fl">Title</label><input id="req-title" type="text" class="fi" placeholder="e.g. Annual leave request"/></div>
+          <div class="fr">
+            <div class="fg2"><label class="fl">Type</label><select id="req-type" class="fsel"><option value="leave">🌴 Leave</option><option value="expense">💰 Expense</option><option value="wfh">🏠 Work From Home</option><option value="overtime">⏱ Overtime</option></select></div>
+            <div class="fg2"><label class="fl">Start Date</label><input id="req-start" type="date" class="fi"/></div>
+          </div>
+          <div class="fg2" style="max-width:50%;"><label class="fl">End Date</label><input id="req-end" type="date" class="fi"/></div>
+          <div class="fg2"><label class="fl">Description</label><textarea id="req-desc" class="fta" placeholder="Provide details about your request..."></textarea></div>
+          <div style="background:var(--glass);border:1px solid var(--border);border-radius:11px;padding:.9rem;margin-top:.4rem;">
+            <div style="font-size:.65rem;color:var(--text2);margin-bottom:9px;text-transform:uppercase;letter-spacing:.8px;">Approval Journey</div>
+            <div class="lvl-steps">
+              <div class="lvl-step"><div class="lc a">L1</div><div class="lt">Manager</div></div>
+              <div class="lvl-step"><div class="lc">L2</div><div class="lt">HR</div></div>
+              <div class="lvl-step"><div class="lc">L3</div><div class="lt">Admin</div></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:1.1rem;">
+            <button class="btn-p" style="flex:1;" onclick="submitRequest()">Submit Request →</button>
+            <button class="btn-s" onclick="clearForm()">Clear</button>
+          </div>
+          <div id="submit-err" class="err-box"></div>
+        </div>
+      </div>
+
+      <!-- ANALYTICS -->
+      <div id="view-analytics" class="view">
+        <div class="ph"><div class="pt">Analytics</div><div class="ps">Workflow performance insights</div></div>
+        <div class="stats-grid">
+          <div class="stat s-b"><div class="sl">Total</div><div class="sv" id="a-total">—</div></div>
+          <div class="stat s-a"><div class="sl">Pending</div><div class="sv" id="a-pending">—</div></div>
+          <div class="stat s-g"><div class="sl">Approved</div><div class="sv" id="a-approved">—</div></div>
+          <div class="stat s-r"><div class="sl">Escalated</div><div class="sv" id="a-escalated">—</div></div>
+        </div>
+        <div class="card"><div class="ct">Status Breakdown</div><div id="analytics-bars" style="padding:.4rem 0;"></div></div>
+      </div>
+
+      <!-- DETAIL -->
+      <div id="view-detail" class="view">
+        <div style="display:flex;align-items:center;gap:11px;margin-bottom:1.4rem;">
+          <button class="btn-s" onclick="goBack()" style="padding:7px 13px;">← Back</button>
+          <div><div class="pt" id="det-title">Request</div><div class="ps" id="det-sub">—</div></div>
+        </div>
+        <div class="dg">
+          <div>
+            <div class="card"><div class="ct">Request Info</div><div id="det-info"></div></div>
+            <div class="card"><div class="ct">Approval Timeline</div><div id="det-timeline" class="timeline"></div></div>
+          </div>
+          <div class="card" id="action-card" style="display:none;">
+            <div class="ct">Take Action</div>
+            <div class="fg2"><label class="fl">Comment</label><textarea id="action-comment" class="fta" placeholder="Add review comment..." style="min-height:65px;"></textarea></div>
+            <div style="display:flex;gap:7px;">
+              <button class="bsm bapp" style="flex:1;padding:9px;" onclick="takeAction('approved')">✅ Approve</button>
+              <button class="bsm brej" style="flex:1;padding:9px;" onclick="takeAction('rejected')">❌ Reject</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API_BASE='http://localhost:5000/api';
+let token=localStorage.getItem('fd_token');
+let currentUser=JSON.parse(localStorage.getItem('fd_user')||'null');
+let lastView='dashboard',currentReqId=null;
+
+window.addEventListener('DOMContentLoaded',()=>{
+  if(token&&currentUser)showMainApp();
+  const t=new Date().toISOString().split('T')[0];
+  document.getElementById('req-start').value=t;
+  document.getElementById('req-end').value=t;
+});
+
+function switchTab(t){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',t==='login'?i===0:i===1));
+  document.getElementById('tab-login').classList.toggle('active',t==='login');
+  document.getElementById('tab-register').classList.toggle('active',t==='register');
+}
+function demoLogin(e,p){document.getElementById('login-email').value=e;document.getElementById('login-password').value=p;handleLogin();}
+
+async function handleLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const password=document.getElementById('login-password').value;
+  const err=document.getElementById('login-err');err.style.display='none';
+  if(!email||!password)return showErr(err,'Fill all fields.');
+  try{
+    const res=await api('/auth/login','POST',{email,password});
+    token=res.token;currentUser=res.user||{email};
+    if(!currentUser.role){const p=JSON.parse(atob(token.split('.')[1]));currentUser.role=p.role;currentUser._id=p.id;}
+    localStorage.setItem('fd_token',token);localStorage.setItem('fd_user',JSON.stringify(currentUser));
+    showMainApp();
+  }catch(e){showErr(err,e.message||'Login failed.');}
+}
+
+async function handleRegister(){
+  const name=document.getElementById('reg-name').value.trim();
+  const email=document.getElementById('reg-email').value.trim();
+  const password=document.getElementById('reg-password').value;
+  const role=document.getElementById('reg-role').value;
+  const err=document.getElementById('reg-err');err.style.display='none';
+  if(!name||!email||!password)return showErr(err,'Fill all fields.');
+  try{await api('/auth/register','POST',{name,email,password,role});showToast('Account created! Sign in.');document.getElementById('login-email').value=email;document.getElementById('login-password').value=password;switchTab('login');}
+  catch(e){showErr(err,e.message||'Failed.');}
+}
+
+function logout(){localStorage.clear();token=null;currentUser=null;document.getElementById('main-page').classList.remove('active');document.getElementById('login-page').classList.add('active');}
+
+function showMainApp(){
+  document.getElementById('login-page').classList.remove('active');
+  document.getElementById('main-page').classList.add('active');
+  const name=currentUser.name||currentUser.email||'User';
+  document.getElementById('top-nm').textContent=name;
+  document.getElementById('top-rl').textContent=(currentUser.role||'user').toUpperCase();
+  document.getElementById('top-av').textContent=name.slice(0,2).toUpperCase();
+  document.getElementById('welcome-txt').textContent=`Good day, ${name.split(' ')[0]}! 👋`;
+  const role=currentUser.role;
+  if(['manager','hr','admin'].includes(role))document.getElementById('nav-all-requests').classList.remove('hidden');
+  if(['hr','admin'].includes(role))document.getElementById('nav-analytics-sec').classList.remove('hidden');
+  loadDashboard();
+}
+
+function showView(v){
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  document.getElementById('view-'+v)?.classList.add('active');
+  document.getElementById('nav-'+v)?.classList.add('active');
+  lastView=v;
+  if(v==='dashboard')loadDashboard();
+  if(v==='my-requests')loadMyRequests();
+  if(v==='all-requests')loadAllRequests();
+  if(v==='analytics')loadAnalytics();
+}
+function goBack(){showView(lastView==='detail'?'my-requests':lastView);}
+
+async function api(path,method='GET',body=null){
+  const opts={method,headers:{'Content-Type':'application/json'}};
+  if(token)opts.headers['Authorization']=`Bearer ${token}`;
+  if(body)opts.body=JSON.stringify(body);
+  const res=await fetch(API_BASE+path,opts);
+  const data=await res.json();
+  if(!res.ok)throw new Error(data.message||'Failed');
+  return data;
+}
+
+async function loadDashboard(){
+  try{
+    if(['hr','admin'].includes(currentUser.role)){
+      const d=(await api('/requests/dashboard/stats')).dashboard||{};
+      document.getElementById('st-total').textContent=d.total??0;
+      document.getElementById('st-pending').textContent=d.pending??0;
+      document.getElementById('st-approved').textContent=d.approved??0;
+      document.getElementById('st-escalated').textContent=d.escalated??0;
+    }else{
+      const reqs=(await api('/requests/my')).requests||[];
+      document.getElementById('st-total').textContent=reqs.length;
+      document.getElementById('st-pending').textContent=reqs.filter(r=>r.status==='pending').length;
+      document.getElementById('st-approved').textContent=reqs.filter(r=>r.status==='approved').length;
+      document.getElementById('st-escalated').textContent=reqs.filter(r=>r.status==='escalated').length;
+    }
+    const src=['manager','hr','admin'].includes(currentUser.role)?'/requests/':'/requests/my';
+    const reqs=((await api(src)).requests||[]).slice(0,6);
+    document.getElementById('recent-list').innerHTML=reqs.length
+      ?reqs.map(r=>`<div class="ri"><div><div class="rt">${r.title}</div><div class="rm">${r.type?.toUpperCase()} · ${timeAgo(r.createdAt)}</div></div>${badge(r.status)}</div>`).join('')
+      :'<div class="empty"><div class="ei">📭</div><div class="et">No activity yet</div></div>';
+  }catch(e){console.error(e);}
+}
+
+async function loadMyRequests(){
+  try{
+    const reqs=(await api('/requests/my')).requests||[];
+    document.getElementById('my-req-body').innerHTML=reqs.length
+      ?reqs.map(r=>`<tr><td style="font-weight:500;">${r.title}</td><td style="color:var(--text2);font-size:.76rem;text-transform:uppercase;">${r.type}</td><td>${badge(r.status)}</td><td>${lvlBadge(r.currentLevel,r.status)}</td><td style="color:var(--text2);font-size:.78rem;">${fmtDate(r.createdAt)}</td><td><button class="bsm bv" onclick="viewDetail('${r._id}')">View →</button></td></tr>`).join('')
+      :`<tr><td colspan="6"><div class="empty"><div class="ei">📭</div><div class="et">No requests. <span style="color:var(--accent);cursor:pointer;" onclick="showView('submit')">Submit one →</span></div></div></td></tr>`;
+  }catch(e){showToast('Failed to load',true);}
+}
+
+async function loadAllRequests(){
+  try{
+    const reqs=(await api('/requests/')).requests||[];
+    document.getElementById('all-req-body').innerHTML=reqs.length
+      ?reqs.map(r=>`<tr><td style="font-weight:500;">${r.title}</td><td style="font-size:.78rem;color:var(--text2);">${r.requestedBy?.name||'Employee'}</td><td style="font-size:.76rem;color:var(--text2);text-transform:uppercase;">${r.type}</td><td>${badge(r.status)}</td><td style="font-size:.76rem;color:${slaColor(r.slaDeadline)};">${slaLabel(r.slaDeadline)}</td><td><button class="bsm bv" onclick="viewDetail('${r._id}')">Review →</button></td></tr>`).join('')
+      :`<tr><td colspan="6"><div class="empty"><div class="ei">📭</div><div class="et">No requests</div></div></td></tr>`;
+  }catch(e){showToast('Failed to load',true);}
+}
+
+async function submitRequest(){
+  const title=document.getElementById('req-title').value.trim();
+  const type=document.getElementById('req-type').value;
+  const description=document.getElementById('req-desc').value.trim();
+  const startDate=document.getElementById('req-start').value;
+  const endDate=document.getElementById('req-end').value;
+  const err=document.getElementById('submit-err');err.style.display='none';
+  if(!title||!description)return showErr(err,'Title and description required.');
+  try{await api('/requests/submit','POST',{title,type,description,startDate,endDate});showToast('Submitted! 🎉');clearForm();showView('my-requests');}
+  catch(e){showErr(err,e.message||'Failed.');}
+}
+function clearForm(){['req-title','req-desc'].forEach(i=>document.getElementById(i).value='');document.getElementById('req-type').value='leave';}
+
+async function viewDetail(id){
+  currentReqId=id;
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-detail').classList.add('active');
+  try{
+    const raw=await api(`/requests/${id}`);
+    const r=raw.request||raw;
+    document.getElementById('det-title').textContent=r.title;
+    document.getElementById('det-sub').textContent=`${r.type?.toUpperCase()} · ${r.requestedBy?.name||'Employee'} · ${fmtDate(r.createdAt)}`;
+    document.getElementById('det-info').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:.9rem;"><div><div style="font-size:.65rem;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Status</div>${badge(r.status)}</div><div><div style="font-size:.65rem;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Level</div>${lvlBadge(r.currentLevel,r.status)}</div><div><div style="font-size:.65rem;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Start</div><div style="font-size:.82rem;">${fmtDate(r.startDate)}</div></div><div><div style="font-size:.65rem;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">End</div><div style="font-size:.82rem;">${fmtDate(r.endDate)}</div></div><div style="grid-column:1/-1;"><div style="font-size:.65rem;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Description</div><div style="font-size:.82rem;line-height:1.6;color:var(--text2);">${r.description||'—'}</div></div><div><div style="font-size:.65rem;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">SLA Deadline</div><div style="font-size:.78rem;color:${slaColor(r.slaDeadline)};">${r.slaDeadline?new Date(r.slaDeadline).toLocaleString():'—'}</div></div></div>`;
+    const matrix=r.approvalMatrix||[];
+    const steps=[{level:1,label:'Manager Review'},{level:2,label:'HR Review'},{level:3,label:'Admin Final Approval'}];
+    document.getElementById('det-timeline').innerHTML=steps.map(s=>{
+      const e=matrix.find(m=>m.level===s.level);
+      if(e){const cls=e.action==='approved'?'done':'rej';return `<div class="tl-item"><div class="tl-dot ${cls}"></div><div class="tl-t">${s.label} — <span style="color:var(--text2);font-weight:400;">${e.action?.toUpperCase()}</span></div><div class="tl-m">${e.comment||'No comment'} · ${fmtDate(e.actionAt)}</div></div>`;}
+      const cur=r.currentLevel===s.level&&!['approved','rejected'].includes(r.status);
+      return `<div class="tl-item"><div class="tl-dot ${cur?'':'wait'}"></div><div class="tl-t" style="color:${cur?'var(--accent)':'var(--text2)'};">${s.label}${cur?' ← Awaiting':''}</div><div class="tl-m">${cur?'In queue':'Not reached yet'}</div></div>`;
+    }).join('')+(r.status==='approved'?`<div class="tl-item"><div class="tl-dot done"></div><div class="tl-t" style="color:var(--green);">✅ Fully Approved</div></div>`:'');
+    const role=currentUser.role;
+    const canAct=(role==='manager'&&r.currentLevel===1&&r.status==='pending')||(role==='hr'&&r.currentLevel===2&&r.status==='approved_by_manager')||(role==='admin'&&r.currentLevel===3&&r.status==='approved_by_hr');
+    document.getElementById('action-card').style.display=canAct?'block':'none';
+  }catch(e){showToast('Failed to load',true);}
+}
+
+async function takeAction(action){
+  const comment=document.getElementById('action-comment').value.trim()||(action==='approved'?'Approved':'Rejected');
+  try{await api(`/requests/${currentReqId}/action`,'PATCH',{action,comment});showToast(`Request ${action} ✅`);viewDetail(currentReqId);}
+  catch(e){showToast(e.message||'Failed',true);}
+}
+
+async function loadAnalytics(){
+  try{
+    const d=(await api('/requests/dashboard/stats')).dashboard||{};
+    document.getElementById('a-total').textContent=d.total??0;
+    document.getElementById('a-pending').textContent=d.pending??0;
+    document.getElementById('a-approved').textContent=d.approved??0;
+    document.getElementById('a-escalated').textContent=d.escalated??0;
+    const total=d.total||1;
+    const bars=[{label:'Approved',val:d.approved||0,color:'var(--green)'},{label:'Pending',val:d.pending||0,color:'var(--amber)'},{label:'Rejected',val:d.rejected||0,color:'var(--red)'},{label:'Escalated',val:d.escalated||0,color:'var(--accent2)'}];
+    document.getElementById('analytics-bars').innerHTML=bars.map(b=>`<div class="ab-item"><div class="ab-h"><span>${b.label}</span><span style="color:var(--text2);">${b.val}</span></div><div class="ab-tr"><div class="ab-fi" style="width:${Math.round((b.val/total)*100)}%;background:${b.color};"></div></div></div>`).join('');
+  }catch(e){showToast('Failed',true);}
+}
+
+function badge(s){const m={pending:['b-pend','⏳ Pending'],approved_by_manager:['b-l1','✔ Mgr Approved'],approved_by_hr:['b-l2','✔ HR Approved'],approved:['b-appr','✅ Approved'],rejected:['b-reje','❌ Rejected'],escalated:['b-esca','🚨 Escalated']};const[c,l]=m[s]||['','—'];return `<span class="badge ${c}">${l}</span>`;}
+function lvlBadge(l,s){if(s==='approved')return`<span class="badge b-appr">Complete</span>`;if(s==='rejected')return`<span class="badge b-reje">Stopped</span>`;const c={1:'b-l1',2:'b-l2',3:'b-l3'},lb={1:'L1 · Manager',2:'L2 · HR',3:'L3 · Admin'};return`<span class="badge ${c[l]||''}">${lb[l]||'—'}</span>`;}
+function slaColor(d){if(!d)return'var(--text2)';const diff=new Date(d)-Date.now();return diff<0?'var(--red)':diff<28800000?'var(--amber)':'var(--green)';}
+function slaLabel(d){if(!d)return'—';const diff=new Date(d)-Date.now();if(diff<0)return'⚠ Breached';return`${Math.floor(diff/3600000)}h left`;}
+function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
+function timeAgo(d){if(!d)return'';const diff=Date.now()-new Date(d);const m=Math.floor(diff/60000);if(m<60)return`${m}m ago`;const h=Math.floor(m/60);return h<24?`${h}h ago`:`${Math.floor(h/24)}d ago`;}
+function showErr(el,msg){el.textContent=msg;el.style.display='block';}
+function showToast(msg,isErr=false){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(isErr?' err':'');setTimeout(()=>t.className='toast',3000);}
+</script>
+</body>
+</html>
