@@ -271,7 +271,8 @@
       .btn-out{display:none;}
       .ham{display:flex;}
 
-      /* Sidebar — slide in from left */
+      /* Sidebar — overlay only on mobile */
+      .app-layout{display:block!important;width:100%;}
       .sidebar{
         position:fixed;top:54px;left:0;bottom:0;
         width:240px;z-index:160;
@@ -281,12 +282,12 @@
         backdrop-filter:blur(20px);
         padding-top:1.4rem;
         min-height:unset;
+        overflow-y:auto;
       }
       .sidebar.open{transform:translateX(0);}
-      .app-layout{display:block;}
 
-      /* Content */
-      .content{padding:1rem;padding-bottom:80px;}
+      /* Content — always full width */
+      .content{padding:1rem;padding-bottom:80px;width:100%;box-sizing:border-box;}
       .pt{font-size:1.35rem;}
       .stats-grid{grid-template-columns:1fr 1fr;gap:.6rem;}
       .sv{font-size:1.7rem;}
