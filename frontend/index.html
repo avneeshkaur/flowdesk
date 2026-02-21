@@ -40,7 +40,7 @@
     .page.active{display:flex;}
 
     /* ── LOGIN ── */
-    #login-page{align-items:center;justify-content:center;padding:2rem;}
+    #login-page{align-items:center;justify-content:center;padding:1.5rem;}
     .login-wrap{
       display:grid;grid-template-columns:1fr 420px;
       width:100%;max-width:880px;min-height:540px;
@@ -100,25 +100,29 @@
     .db-h{background:rgba(167,139,250,.09);color:#c4b5fd;border-color:rgba(167,139,250,.18);}
     .db-a{background:rgba(251,191,36,.09);color:#fde68a;border-color:rgba(251,191,36,.18);}
 
-    @media(max-width:680px){.login-wrap{grid-template-columns:1fr;}.login-left{display:none;}}
-
     /* ── MAIN APP ── */
     #main-page{flex-direction:column;}
 
-    .topbar{height:54px;display:flex;align-items:center;padding:0 1.4rem;gap:1rem;background:rgba(5,8,15,.82);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+    .topbar{height:54px;display:flex;align-items:center;padding:0 1.4rem;gap:.7rem;background:rgba(5,8,15,.82);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;}
     .tb-logo{display:flex;align-items:center;gap:9px;margin-right:auto;}
-    .tb-icon{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:13px;}
+    .tb-icon{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
     .tb-name{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700;}
     .tb-name span{color:var(--accent);}
     .user-chip{display:flex;align-items:center;gap:7px;background:var(--glass);border:1px solid var(--border2);border-radius:50px;padding:3px 11px 3px 3px;}
-    .u-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;}
+    .u-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;}
     .u-nm{font-size:.78rem;}
     .u-rl{font-size:.62rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;}
-    .btn-out{background:transparent;border:1px solid var(--border2);color:var(--text2);padding:5px 13px;border-radius:8px;font-size:.78rem;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;}
+    .btn-out{background:transparent;border:1px solid var(--border2);color:var(--text2);padding:5px 13px;border-radius:8px;font-size:.78rem;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;white-space:nowrap;}
     .btn-out:hover{color:var(--red);border-color:rgba(248,113,113,.35);}
 
-    .app-layout{display:flex;flex:1;}
-    .sidebar{width:205px;min-height:calc(100vh - 54px);border-right:1px solid var(--border);padding:1.1rem .65rem;background:rgba(5,8,15,.35);flex-shrink:0;}
+    /* hamburger */
+    .ham{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:4px;background:none;border:none;}
+    .ham span{display:block;width:20px;height:2px;background:var(--text2);border-radius:2px;transition:all .2s;}
+
+    .app-layout{display:flex;flex:1;position:relative;}
+
+    /* sidebar */
+    .sidebar{width:205px;min-height:calc(100vh - 54px);border-right:1px solid var(--border);padding:1.1rem .65rem;background:rgba(5,8,15,.35);flex-shrink:0;transition:transform .25s ease;}
     .nav-sec{margin-bottom:1.4rem;}
     .nav-lbl{font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px;margin-bottom:4px;font-weight:600;}
     .nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;font-size:.82rem;cursor:pointer;color:var(--text2);transition:all .15s;margin-bottom:1px;}
@@ -126,7 +130,11 @@
     .nav-item.active{color:var(--accent);background:rgba(110,168,254,.07);}
     .nav-icon{font-size:13px;width:15px;text-align:center;}
 
-    .content{flex:1;padding:1.7rem;overflow-y:auto;}
+    /* sidebar overlay for mobile */
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:150;backdrop-filter:blur(2px);}
+    .sidebar-overlay.show{display:block;}
+
+    .content{flex:1;padding:1.7rem;overflow-y:auto;min-width:0;}
     .view{display:none;}
     .view.active{display:block;}
 
@@ -139,7 +147,7 @@
     .wt{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;margin-bottom:2px;}
     .ws{font-size:.8rem;color:var(--text2);}
 
-    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:.9rem;margin-bottom:1.4rem;}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.9rem;margin-bottom:1.4rem;}
     .stat{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:1.15rem;position:relative;overflow:hidden;animation:fu .5s ease both;}
     .stat::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;}
     .s-b::before{background:linear-gradient(90deg,var(--accent),var(--accent2));}
@@ -155,8 +163,8 @@
     .card{background:var(--glass);border:1px solid var(--border);border-radius:15px;padding:1.3rem;margin-bottom:1.1rem;}
     .ct{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;margin-bottom:1rem;}
 
-    .tw{overflow-x:auto;}
-    table{width:100%;border-collapse:collapse;}
+    .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    table{width:100%;border-collapse:collapse;min-width:500px;}
     th{text-align:left;font-size:.65rem;text-transform:uppercase;letter-spacing:1px;color:var(--text3);padding:7px 11px;border-bottom:1px solid var(--border);font-weight:600;}
     td{padding:10px 11px;font-size:.83rem;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle;}
     tr:last-child td{border-bottom:none;}
@@ -213,7 +221,6 @@
     .toast.err{background:var(--red);color:#fff;}
 
     .dg{display:grid;grid-template-columns:1fr 290px;gap:1.1rem;align-items:start;}
-    @media(max-width:780px){.dg{grid-template-columns:1fr;}}
 
     .ri{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.035);}
     .ri:last-child{border-bottom:none;}
@@ -225,11 +232,95 @@
     .ab-tr{background:var(--glass2);border-radius:50px;height:5px;overflow:hidden;}
     .ab-fi{height:100%;border-radius:50px;transition:width .9s ease;}
 
+    /* bottom nav for mobile */
+    .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:60px;background:rgba(5,8,15,.95);backdrop-filter:blur(16px);border-top:1px solid var(--border);z-index:190;align-items:center;justify-content:space-around;padding:0 .5rem;}
+    .bn-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 12px;border-radius:10px;cursor:pointer;color:var(--text3);transition:all .2s;border:none;background:none;font-family:'Outfit',sans-serif;}
+    .bn-item.active{color:var(--accent);}
+    .bn-icon{font-size:18px;}
+    .bn-label{font-size:.55rem;text-transform:uppercase;letter-spacing:.5px;}
+
     .hidden{display:none!important;}
+
+    /* ═══════════════════════════
+       TABLET  (768px – 1024px)
+    ═══════════════════════════ */
+    @media(max-width:1024px){
+      .login-wrap{max-width:780px;}
+      .ll-tagline{font-size:1.9rem;}
+      .sidebar{width:180px;}
+      .content{padding:1.3rem;}
+      .dg{grid-template-columns:1fr 260px;}
+    }
+
+    /* ═══════════════════════════
+       MOBILE  (≤ 767px)
+    ═══════════════════════════ */
+    @media(max-width:767px){
+      /* Login */
+      #login-page{padding:1rem;align-items:flex-start;padding-top:2rem;}
+      .login-wrap{grid-template-columns:1fr;min-height:auto;border-radius:18px;}
+      .login-left{display:none;}
+      .login-right{padding:1.8rem 1.4rem;}
+      .lr-title{font-size:1.5rem;}
+
+      /* Topbar */
+      .topbar{padding:0 1rem;gap:.5rem;}
+      .tb-name{font-size:1rem;}
+      .u-nm,.u-rl{display:none;}
+      .user-chip{padding:3px;}
+      .btn-out{display:none;}
+      .ham{display:flex;}
+
+      /* Sidebar — slide in from left */
+      .sidebar{
+        position:fixed;top:54px;left:0;bottom:0;
+        width:240px;z-index:160;
+        transform:translateX(-100%);
+        border-right:1px solid var(--border2);
+        background:rgba(5,8,15,.97);
+        backdrop-filter:blur(20px);
+        padding-top:1.4rem;
+      }
+      .sidebar.open{transform:translateX(0);}
+
+      /* Content */
+      .content{padding:1rem;padding-bottom:80px;}
+      .pt{font-size:1.35rem;}
+      .stats-grid{grid-template-columns:1fr 1fr;gap:.6rem;}
+      .sv{font-size:1.7rem;}
+
+      /* Form */
+      .fr{grid-template-columns:1fr;}
+      .fg2 .fi[type="date"]{width:100%;}
+      div[style*="max-width:50%"]{max-width:100%!important;}
+
+      /* Detail grid */
+      .dg{grid-template-columns:1fr;}
+
+      /* Bottom nav */
+      .bottom-nav{display:flex;}
+
+      /* Toast */
+      .toast{left:1rem;right:1rem;text-align:center;}
+
+      /* Table scroll hint */
+      .tw::after{content:'← scroll →';display:block;font-size:.65rem;color:var(--text3);text-align:center;padding:.4rem 0;}
+    }
+
+    /* ═══════════════════════════
+       VERY SMALL  (≤ 380px)
+    ═══════════════════════════ */
+    @media(max-width:380px){
+      .stats-grid{grid-template-columns:1fr 1fr;}
+      .sv{font-size:1.4rem;}
+      .demo-btns{justify-content:center;}
+      .db{flex:1;text-align:center;}
+    }
   </style>
 </head>
 <body>
 <div class="bg-scene"><div class="orb orb1"></div><div class="orb orb2"></div></div>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 <div id="app">
 
 <!-- LOGIN -->
@@ -288,6 +379,9 @@
 <!-- MAIN -->
 <div id="main-page" class="page">
   <div class="topbar">
+    <button class="ham" id="ham-btn" onclick="toggleSidebar()">
+      <span></span><span></span><span></span>
+    </button>
     <div class="tb-logo">
       <div class="tb-icon">🔄</div>
       <div class="tb-name">Flow<span>Desk</span></div>
@@ -298,8 +392,9 @@
     </div>
     <button class="btn-out" onclick="logout()">Sign out</button>
   </div>
+
   <div class="app-layout">
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
       <div class="nav-sec">
         <div class="nav-lbl">Overview</div>
         <div class="nav-item active" id="nav-dashboard" onclick="showView('dashboard')"><span class="nav-icon">📊</span>Dashboard</div>
@@ -314,9 +409,13 @@
         <div class="nav-lbl">Analytics</div>
         <div class="nav-item" id="nav-analytics" onclick="showView('analytics')"><span class="nav-icon">📈</span>Analytics</div>
       </div>
+      <!-- sign out inside sidebar for mobile -->
+      <div style="padding:.5rem 8px;margin-top:auto;">
+        <div class="nav-item" onclick="logout()" style="color:var(--red);margin-top:1rem;"><span class="nav-icon">↩</span>Sign Out</div>
+      </div>
     </div>
-    <div class="content">
 
+    <div class="content">
       <!-- DASHBOARD -->
       <div id="view-dashboard" class="view active">
         <div class="ph"><div class="pt">Dashboard</div><div class="ps">Real-time workflow overview</div></div>
@@ -352,7 +451,7 @@
             <div class="fg2"><label class="fl">Type</label><select id="req-type" class="fsel"><option value="leave">🌴 Leave</option><option value="expense">💰 Expense</option><option value="wfh">🏠 Work From Home</option><option value="overtime">⏱ Overtime</option></select></div>
             <div class="fg2"><label class="fl">Start Date</label><input id="req-start" type="date" class="fi"/></div>
           </div>
-          <div class="fg2" style="max-width:50%;"><label class="fl">End Date</label><input id="req-end" type="date" class="fi"/></div>
+          <div class="fg2"><label class="fl">End Date</label><input id="req-end" type="date" class="fi"/></div>
           <div class="fg2"><label class="fl">Description</label><textarea id="req-desc" class="fta" placeholder="Provide details about your request..."></textarea></div>
           <div style="background:var(--glass);border:1px solid var(--border);border-radius:11px;padding:.9rem;margin-top:.4rem;">
             <div style="font-size:.65rem;color:var(--text2);margin-bottom:9px;text-transform:uppercase;letter-spacing:.8px;">Approval Journey</div>
@@ -403,10 +502,19 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
+
+  <!-- BOTTOM NAV (mobile only) -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="bn-item active" id="bn-dashboard" onclick="showView('dashboard')"><span class="bn-icon">📊</span><span class="bn-label">Home</span></button>
+    <button class="bn-item" id="bn-my-requests" onclick="showView('my-requests')"><span class="bn-icon">📋</span><span class="bn-label">Mine</span></button>
+    <button class="bn-item hidden" id="bn-all-requests" onclick="showView('all-requests')"><span class="bn-icon">📂</span><span class="bn-label">All</span></button>
+    <button class="bn-item" id="bn-submit" onclick="showView('submit')"><span class="bn-icon">✦</span><span class="bn-label">New</span></button>
+    <button class="bn-item hidden" id="bn-analytics" onclick="showView('analytics')"><span class="bn-icon">📈</span><span class="bn-label">Stats</span></button>
+  </nav>
 </div>
+
 </div>
 <div class="toast" id="toast"></div>
 
@@ -422,6 +530,18 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('req-start').value=t;
   document.getElementById('req-end').value=t;
 });
+
+/* sidebar toggle */
+function toggleSidebar(){
+  const s=document.getElementById('sidebar');
+  const o=document.getElementById('sidebar-overlay');
+  s.classList.toggle('open');
+  o.classList.toggle('show');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
 
 function switchTab(t){
   document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',t==='login'?i===0:i===1));
@@ -455,7 +575,7 @@ async function handleRegister(){
   catch(e){showErr(err,e.message||'Failed.');}
 }
 
-function logout(){localStorage.clear();token=null;currentUser=null;document.getElementById('main-page').classList.remove('active');document.getElementById('login-page').classList.add('active');}
+function logout(){localStorage.clear();token=null;currentUser=null;document.getElementById('main-page').classList.remove('active');document.getElementById('login-page').classList.add('active');closeSidebar();}
 
 function showMainApp(){
   document.getElementById('login-page').classList.remove('active');
@@ -466,17 +586,26 @@ function showMainApp(){
   document.getElementById('top-av').textContent=name.slice(0,2).toUpperCase();
   document.getElementById('welcome-txt').textContent=`Good day, ${name.split(' ')[0]}! 👋`;
   const role=currentUser.role;
-  if(['manager','hr','admin'].includes(role))document.getElementById('nav-all-requests').classList.remove('hidden');
-  if(['hr','admin'].includes(role))document.getElementById('nav-analytics-sec').classList.remove('hidden');
+  if(['manager','hr','admin'].includes(role)){
+    document.getElementById('nav-all-requests').classList.remove('hidden');
+    document.getElementById('bn-all-requests').classList.remove('hidden');
+  }
+  if(['hr','admin'].includes(role)){
+    document.getElementById('nav-analytics-sec').classList.remove('hidden');
+    document.getElementById('bn-analytics').classList.remove('hidden');
+  }
   loadDashboard();
 }
 
 function showView(v){
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.bn-item').forEach(x=>x.classList.remove('active'));
   document.getElementById('view-'+v)?.classList.add('active');
   document.getElementById('nav-'+v)?.classList.add('active');
+  document.getElementById('bn-'+v)?.classList.add('active');
   lastView=v;
+  closeSidebar();
   if(v==='dashboard')loadDashboard();
   if(v==='my-requests')loadMyRequests();
   if(v==='all-requests')loadAllRequests();
