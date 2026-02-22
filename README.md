@@ -84,6 +84,10 @@ frontend/
 └── index.html       # Dashboard UI
 ```
 
----
+## Live Demo
+
+- 🌐 Frontend: [flowdesk-ecru-ten.vercel.app](https://flowdesk-ecru-ten.vercel.app)
+- ⚙️ Backend API: [flowdesk-c740.onrender.com](https://flowdesk-c740.onrender.com)
+- 📁 GitHub: [github.com/avneeshkaur/flowdesk](https://github.com/avneeshkaur/flowdesk)
 
 Built by [Avneesh Kaur](https://github.com/avneeshkaur) — [LinkedIn](https://linkedin.com/in/avneeshkaur-dev)
